@@ -6,87 +6,80 @@
 using namespace std;
 
 struct Player {
-    int id;
-    int position;
+    int pos = 0;
 };
 
-int rollDice() {
+map<int, int> snakes = {
+    {16, 6},
+    {48, 26},
+    {62, 19},
+    {88, 24}
+};
+
+map<int, int> ladders = {
+    {3, 22},
+    {5, 8},
+    {11, 26},
+    {20, 29}
+};
+
+int roll_dice() {
     return rand() % 6 + 1;
 }
 
-void movePlayer(Player &player,
-                int dice,
-                map<int, int> &snakes,
-                map<int, int> &ladders) {
+bool check_winner(Player players[], int count) {
+    for (int i = 0; i < count; i++) {
+        if (players[i].pos == 100)
+            return true;
+    }
+    return false;
+}
 
-    int newPosition = player.position + dice;
+void move(Player& player, int value) {
+    int newPos = player.pos + value;
 
-    if (newPosition > 100) {
-        cout << "Dice too large. Turn skipped." << endl;
+    if (newPos > 100)
         return;
-    }
 
-    player.position = newPosition;
+    player.pos = newPos;
 
-    if (snakes.count(player.position)) {
-        cout << "Snake! Going down." << endl;
-        player.position = snakes[player.position];
+    if (snakes.count(player.pos)) {
+        player.pos = snakes[player.pos];
     }
-    else if (ladders.count(player.position)) {
-        cout << "Ladder! Going up." << endl;
-        player.position = ladders[player.position];
+    else if (ladders.count(player.pos)) {
+        player.pos = ladders[player.pos];
     }
 }
 
 int main() {
     srand(time(0));
 
-    Player players[4];
-    for (int i = 0; i < 4; i++) {
-        players[i].id = i + 1;
-        players[i].position = 0;
-    }
-
-    map<int, int> snakes = {
-        {16, 6},
-        {48, 26},
-        {62, 19},
-        {88, 24}
-    };
-
-    map<int, int> ladders = {
-        {3, 22},
-        {5, 8},
-        {11, 26},
-        {20, 29}
-    };
-
+    const int PLAYER_COUNT = 4;
+    Player players[PLAYER_COUNT];
     int currentPlayer = 0;
 
     cout << "Snake and Ladder Game (4 Players)" << endl;
 
     while (true) {
-        Player &player = players[currentPlayer];
-
-        cout << "\nPlayer " << player.id
-             << " - Press Enter to roll the dice...";
+        cout << "\nPlayer " << currentPlayer + 1
+             << " - Press Enter to roll dice...";
         cin.get();
 
-        int dice = rollDice();
+        int dice = roll_dice();
         cout << "Dice: " << dice << endl;
 
-        movePlayer(player, dice, snakes, ladders);
+        move(players[currentPlayer], dice);
 
-        cout << "Player " << player.id
-             << " position: " << player.position << endl;
+        cout << "Player " << currentPlayer + 1
+             << " position: " << players[currentPlayer].pos << endl;
 
-        if (player.position == 100) {
-            cout << "\nPlayer " << player.id
+        if (players[currentPlayer].pos == 100) {
+            cout << "\nPlayer " << currentPlayer + 1
                  << " wins the game!" << endl;
             break;
         }
 
-        currentPlayer = (currentPlayer + 1) % 4;
+        currentPlayer = (currentPlayer + 1) % PLAYER_COUNT;
     }
 
     return 0;
