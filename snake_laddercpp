@@ -5,15 +5,47 @@
 
 using namespace std;
 
+struct Player {
+    int id;
+    int position;
+};
+
 int rollDice() {
     return rand() % 6 + 1;
+}
+
+void movePlayer(Player &player,
+                int dice,
+                map<int, int> &snakes,
+                map<int, int> &ladders) {
+
+    int newPosition = player.position + dice;
+
+    if (newPosition > 100) {
+        cout << "Dice too large. Turn skipped." << endl;
+        return;
+    }
+
+    player.position = newPosition;
+
+    if (snakes.count(player.position)) {
+        cout << "Snake! Going down." << endl;
+        player.position = snakes[player.position];
+    }
+    else if (ladders.count(player.position)) {
+        cout << "Ladder! Going up." << endl;
+        player.position = ladders[player.position];
+    }
 }
 
 int main() {
     srand(time(0));
 
-    int positions[4] = {0, 0, 0, 0};
-    int currentPlayer = 0;
+    Player players[4];
+    for (int i = 0; i < 4; i++) {
+        players[i].id = i + 1;
+        players[i].position = 0;
+    }
 
     map<int, int> snakes = {
         {16, 6},
@@ -29,44 +61,32 @@ int main() {
         {20, 29}
     };
 
+    int currentPlayer = 0;
+
     cout << "Snake and Ladder Game (4 Players)" << endl;
 
     while (true) {
-        cout << "\nPlayer " << currentPlayer + 1 
+        Player &player = players[currentPlayer];
+
+        cout << "\nPlayer " << player.id
              << " - Press Enter to roll the dice...";
         cin.get();
 
         int dice = rollDice();
         cout << "Dice: " << dice << endl;
 
-        int newPosition = positions[currentPlayer] + dice;
+        movePlayer(player, dice, snakes, ladders);
 
-        
-        if (newPosition <= 100) {
-            positions[currentPlayer] = newPosition;
+        cout << "Player " << player.id
+             << " position: " << player.position << endl;
 
-            if (snakes.count(positions[currentPlayer])) {
-                cout << "Snake! Going down." << endl;
-                positions[currentPlayer] = snakes[positions[currentPlayer]];
-            }
-            else if (ladders.count(positions[currentPlayer])) {
-                cout << "Ladder! Going up." << endl;
-                positions[currentPlayer] = ladders[positions[currentPlayer]];
-            }
-        } else {
-            cout << "Dice too large. Turn skipped." << endl;
-        }
-
-        cout << "Player " << currentPlayer + 1
-             << " position: " << positions[currentPlayer] << endl;
-
-        // بررسی برنده
-        if (positions[currentPlayer] == 100) {
-            cout << "\nPlayer " << currentPlayer + 1 
+        if (player.position == 100) {
+            cout << "\nPlayer " << player.id
                  << " wins the game!" << endl;
             break;
         }
-         currentPlayer = (currentPlayer + 1) % 4;
+
+        currentPlayer = (currentPlayer + 1) % 4;
     }
 
     return 0;
