@@ -12,7 +12,8 @@ int rollDice() {
 int main() {
     srand(time(0));
 
-    int position = 0;
+    int positions[4] = {0, 0, 0, 0};
+    int currentPlayer = 0;
 
     map<int, int> snakes = {
         {16, 6},
@@ -28,30 +29,45 @@ int main() {
         {20, 29}
     };
 
-    cout << "Snake and Ladder Game" << endl;
+    cout << "Snake and Ladder Game (4 Players)" << endl;
 
-    while (position < 100) {
-        cout << "Press Enter to roll the dice...";
+    while (true) {
+        cout << "\nPlayer " << currentPlayer + 1 
+             << " - Press Enter to roll the dice...";
         cin.get();
 
         int dice = rollDice();
         cout << "Dice: " << dice << endl;
 
-        position += dice;
+        int newPosition = positions[currentPlayer] + dice;
 
-        if (snakes.count(position)) {
-            cout << "Snake! Going down." << endl;
-            position = snakes[position];
-        } 
-        else if (ladders.count(position)) {
-            cout << "Ladder! Going up." << endl;
-            position = ladders[position];
+        
+        if (newPosition <= 100) {
+            positions[currentPlayer] = newPosition;
+
+            if (snakes.count(positions[currentPlayer])) {
+                cout << "Snake! Going down." << endl;
+                positions[currentPlayer] = snakes[positions[currentPlayer]];
+            }
+            else if (ladders.count(positions[currentPlayer])) {
+                cout << "Ladder! Going up." << endl;
+                positions[currentPlayer] = ladders[positions[currentPlayer]];
+            }
+        } else {
+            cout << "Dice too large. Turn skipped." << endl;
         }
 
-        cout << "Current position: " << position << endl;
-        cout << "------------------------" << endl;
+        cout << "Player " << currentPlayer + 1
+             << " position: " << positions[currentPlayer] << endl;
+
+        // بررسی برنده
+        if (positions[currentPlayer] == 100) {
+            cout << "\nPlayer " << currentPlayer + 1 
+                 << " wins the game!" << endl;
+            break;
+        }
+         currentPlayer = (currentPlayer + 1) % 4;
     }
 
-    cout << "Congratulations! You won the game." << endl;
     return 0;
 }
