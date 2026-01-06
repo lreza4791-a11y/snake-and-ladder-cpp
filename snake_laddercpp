@@ -1,0 +1,57 @@
+#include <iostream>
+#include <map>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+int rollDice() {
+    return rand() % 6 + 1;
+}
+
+int main() {
+    srand(time(0));
+
+    int position = 0;
+
+    map<int, int> snakes = {
+        {16, 6},
+        {48, 26},
+        {62, 19},
+        {88, 24}
+    };
+
+    map<int, int> ladders = {
+        {3, 22},
+        {5, 8},
+        {11, 26},
+        {20, 29}
+    };
+
+    cout << "Snake and Ladder Game" << endl;
+
+    while (position < 100) {
+        cout << "Press Enter to roll the dice...";
+        cin.get();
+
+        int dice = rollDice();
+        cout << "Dice: " << dice << endl;
+
+        position += dice;
+
+        if (snakes.count(position)) {
+            cout << "Snake! Going down." << endl;
+            position = snakes[position];
+        } 
+        else if (ladders.count(position)) {
+            cout << "Ladder! Going up." << endl;
+            position = ladders[position];
+        }
+
+        cout << "Current position: " << position << endl;
+        cout << "------------------------" << endl;
+    }
+
+    cout << "Congratulations! You won the game." << endl;
+    return 0;
+}
